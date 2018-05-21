@@ -9,3 +9,9 @@ class LstmParameters(object):
 
 	def fftFreqBins(self):
 		return self._fftWindowLength//2+1
+
+	def fftWindowLength(self):
+		return self._fftWindowLength
+
+	def fftHopSize(self):
+		return self._fftHopSize
