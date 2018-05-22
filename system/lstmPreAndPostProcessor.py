@@ -12,13 +12,16 @@ class LSTMPreAndPostProcessor(object):
 	def inputAndTarget(self, signal):
 		realAndImagStft = self._realAndImagStft(signal)
 
-		netInput = np.empty([64, 4, 65, 2])
-		target = np.empty([64, 1, 65, 2])
+		netInput = np.empty([4, 65])
+		target = np.empty([0, 65])
 		frames_width = 4
 
-		for step in range(realAndImagStft.shape.as_list()[-3]-frames_width-1):
-			netInput = tf.concat([netInput, realAndImagStft[:, step:step + frames_width, :, :]], -3)
-			target = tf.concat([target, realAndImagStft[:, step + frames_width + 1:step + frames_width + 2, :, :]], -3)
+		for step in range(realAndImagStft.shape.as_list()[-2]-frames_width-1):
+			netInput = tf.concat([netInput, realAndImagStft[0, step:step + frames_width, :]], -2)
+			target = tf.concat([target, realAndImagStft[0, step + frames_width + 1:step + frames_width + 2, :]], -2)
+
+		print(netInput.shape)
+		print(target.shape)
 
 		return netInput, target
 
@@ -26,6 +29,7 @@ class LSTMPreAndPostProcessor(object):
 		stft = tf.contrib.signal.stft(signals=signal,
 									  frame_length=self._lstmParameters.fftWindowLength(),
 									  frame_step=self._lstmParameters.fftHopSize())
-		real_part = tf.real(stft)
-		imag_part = tf.imag(stft)
-		return tf.stack([real_part, imag_part], axis=-1, name='divideComplexIntoRealAndImag')
+		return tf.abs(stft)
+		# real_part = tf.real(stft)
+		# imag_part = tf.imag(stft)
+		# return tf.stack([real_part, imag_part], axis=-1, name='divideComplexIntoRealAndImag')
