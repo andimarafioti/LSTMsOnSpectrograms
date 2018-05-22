@@ -21,7 +21,7 @@ class SimpleLSTMArchitecture(Architecture):
 			error_per_example = tf.reduce_sum(tf.square(error), axis=[1])
 
 			reconstruction_loss = 0.5 * tf.reduce_sum(error_per_example * (1 + 5 / (targetSquaredNorm + 1e-4)))
-			lossL2 = 0.0#tf.add_n([tf.nn.l2_loss(v) for v in tf.trainable_variables()]) * 1e-5
+			lossL2 = tf.add_n([tf.nn.l2_loss(v) for v in tf.trainable_variables()]) * 1e-5
 			total_loss = tf.add_n([reconstruction_loss, lossL2])
 
 			total_loss_summary = tf.summary.scalar("total_loss", total_loss)
