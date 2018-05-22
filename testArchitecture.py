@@ -4,11 +4,11 @@ from system.lstmPreAndPostProcessor import LSTMPreAndPostProcessor
 from system.lstmSystem import LSTMSystem
 
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
-sessionsName = "baseline_half_cells_"
+sessionsName = "baseline_oneframe_"
 
-params = LstmParameters(lstmSize=256, signalLength=5120, fftWindowLength=128, fftHopSize=32, countOfFrames=4)
+params = LstmParameters(lstmSize=512, signalLength=5120, fftWindowLength=128, fftHopSize=32, countOfFrames=1)
 batch_size = 1
 
 aContextEncoderArchitecture = SimpleLSTMArchitecture(inputShape=(params.inputFrames(), params.fftFreqBins()), lstmParams=params)
