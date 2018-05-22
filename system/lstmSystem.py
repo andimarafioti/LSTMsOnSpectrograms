@@ -10,7 +10,7 @@ class LSTMSystem(DNNSystem):
 		self._audio = tf.placeholder(tf.float32, shape=(batchSize, self._windowSize), name='audio_data')
 		self._inputAndTarget = aPreProcessor.inputAndTarget(self._audio)
 		super().__init__(architecture, name)
-		self._SNR = tf.reduce_mean(self._pavlovs_SNR(self._architecture.output(), self._architecture.target(), onAxis=[1,2]))
+		self._SNR = tf.reduce_mean(self._pavlovs_SNR(self._architecture.output(), self._architecture.target(), onAxis=[1]))
 
 	def optimizer(self, learningRate):
 		update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
