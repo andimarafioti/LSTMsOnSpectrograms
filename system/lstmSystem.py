@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 from system.dnnSystem import DNNSystem
 from utils.tfReader import TFReader
 
@@ -13,6 +14,25 @@ class LSTMSystem(DNNSystem):
 		self._inputAndTarget = aPreProcessor.inputAndTarget(self._audio)
 		super().__init__(architecture, name)
 		self._SNR = tf.reduce_mean(self._pavlovs_SNR(self._architecture.output(), self._architecture.target(), onAxis=[1]))
+
+	def generate(self, STFT, length=100, model_num=None):
+		with tf.Session() as sess:
+			if model_num is not None:
+				path = self.modelsPath(model_num)
+			else:
+				path = self.modelsPath()
+			saver = tf.train.Saver()
+			saver.restore(sess, path)
+			print("Model restored.")
+			sess.run([tf.local_variables_initializer()])
+
+			spectrograms = STFT
+			for i in range(length):
+				input_data = spectrograms[-self._lstmParameters.countOfFrames():]
+				feed_dict = {self._architecture.input(): input_data, self._architecture.isTraining(): False}
+				nextSpectrogram = sess.run(self._architecture.output(), feed_dict=feed_dict)
+				spectrograms = np.append(spectrograms, nextSpectrogram)
+			return spectrograms
 
 	def optimizer(self, learningRate):
 		update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
