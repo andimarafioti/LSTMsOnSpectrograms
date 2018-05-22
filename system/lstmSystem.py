@@ -26,12 +26,16 @@ class LSTMSystem(DNNSystem):
 			print("Model restored.")
 			sess.run([tf.local_variables_initializer()])
 
-			spectrograms = STFT
+			inputShape = list(STFT.shape)
+			outputShape = inputShape
+			outputShape[0] = inputShape[0] + length
+			spectrograms = np.zeros(outputShape, dtype=np.float32)
+			spectrograms[:len(STFT)] = STFT
 			for i in range(length):
 				input_data = spectrograms[-self._lstmParameters.countOfFrames():]
 				feed_dict = {self._architecture.testInput(): input_data, self._architecture.isTraining(): False}
 				nextSpectrogram = sess.run(self._architecture.generatedOutput(), feed_dict=feed_dict)
-				spectrograms = np.append(spectrograms, nextSpectrogram)
+				spectrograms[len(STFT)+i] = nextSpectrogram
 			return spectrograms
 
 	def optimizer(self, learningRate):
