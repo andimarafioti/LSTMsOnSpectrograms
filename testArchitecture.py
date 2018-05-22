@@ -3,7 +3,7 @@ from architecture.simpleLSTMArchitecture import SimpleLSTMArchitecture
 from system.lstmPreAndPostProcessor import LSTMPreAndPostProcessor
 from system.lstmSystem import LSTMSystem
 
-sessionsName = "LSTM_test_2_"
+sessionsName = "LSTM_test_4_"
 
 params = LstmParameters(lstmSize=512, signalLength=5120, fftWindowLength=128, fftHopSize=32, countOfFrames=4)
 batch_size = 1
