@@ -5,7 +5,7 @@ from system.lstmSystem import LSTMSystem
 
 sessionsName = "LSTM_test_2_"
 
-params = LstmParameters(lstmSize=512, signalLength=5120, fftWindowLength=128, fftHopSize=32)
+params = LstmParameters(lstmSize=512, signalLength=5120, fftWindowLength=128, fftHopSize=32, countOfFrames=4)
 batch_size = 1
 
 aContextEncoderArchitecture = SimpleLSTMArchitecture(inputShape=(608, params.fftFreqBins()), lstmParams=params)

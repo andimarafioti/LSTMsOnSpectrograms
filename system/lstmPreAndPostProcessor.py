@@ -12,9 +12,9 @@ class LSTMPreAndPostProcessor(object):
 	def inputAndTarget(self, signal):
 		realAndImagStft = self._realAndImagStft(signal)
 
-		netInput = np.empty([0, 65])
-		target = np.empty([0, 65])
-		frames_width = 4
+		netInput = np.empty([0, self._lstmParameters.fftFreqBins()])
+		target = np.empty([0, self._lstmParameters.fftFreqBins()])
+		frames_width = self._lstmParameters.countOfFrames()
 
 		for step in range(realAndImagStft.shape.as_list()[-2]-frames_width-1):
 			netInput = tf.concat([netInput, realAndImagStft[0, step:step + frames_width, :]], -2)
