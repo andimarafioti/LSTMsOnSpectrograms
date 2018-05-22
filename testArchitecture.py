@@ -5,12 +5,12 @@ from system.lstmSystem import LSTMSystem
 
 sessionsName = "LSTM_test_1"
 
-params = LstmParameters(lstmSize=512, fftWindowLength=128, fftHopSize=32)
+params = LstmParameters(lstmSize=512, signalLength=5120, fftWindowLength=128, fftHopSize=32)
 batch_size = 64
 
-aContextEncoderArchitecture = SimpleLSTMArchitecture(inputShape=(batch_size, params.fftFreqBins(), 2), lstmParams=params)
+aContextEncoderArchitecture = SimpleLSTMArchitecture(inputShape=(batch_size, 612, params.fftFreqBins(), 2), lstmParams=params)
 
-aPreProcessor = LSTMPreAndPostProcessor(LstmParameters)
+aPreProcessor = LSTMPreAndPostProcessor(params)
 
 aContextEncoderSystem = LSTMSystem(aContextEncoderArchitecture, batch_size, aPreProcessor, sessionsName)
 
