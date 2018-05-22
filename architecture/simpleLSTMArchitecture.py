@@ -43,7 +43,7 @@ class SimpleLSTMArchitecture(Architecture):
 			rnn_cell = tf.contrib.rnn.BasicLSTMCell(self._lstmParams.lstmSize())
 
 			dataset = tf.reshape(data, (-1, self._lstmParams.fftFreqBins()))
-			dataset = tf.split(dataset, 4, -2)
+			dataset = tf.split(dataset, self._lstmParams.countOfFrames(), -2)
 
 			outputs, states = tf.nn.static_rnn(rnn_cell, dataset, dtype=tf.float32)
 

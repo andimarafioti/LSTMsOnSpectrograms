@@ -18,6 +18,12 @@ class LstmParameters(object):
 	def fftFreqBins(self):
 		return self._fftWindowLength//2+1
 
+	def fftFrames(self):
+		return (self._signalLength-self._fftWindowLength)/self._fftHopSize+1
+
+	def inputFrames(self):
+		return (self.fftFrames()-self._countOfFrames-1)*self.countOfFrames()
+
 	def fftWindowLength(self):
 		return self._fftWindowLength
 
