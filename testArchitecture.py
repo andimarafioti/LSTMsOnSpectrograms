@@ -12,6 +12,6 @@ aContextEncoderArchitecture = SimpleLSTMArchitecture(inputShape=(608, params.fft
 
 aPreProcessor = LSTMPreAndPostProcessor(params)
 
-aContextEncoderSystem = LSTMSystem(aContextEncoderArchitecture, batch_size, aPreProcessor, sessionsName)
+aContextEncoderSystem = LSTMSystem(aContextEncoderArchitecture, batch_size, aPreProcessor, params, sessionsName)
 
 aContextEncoderSystem.train("fake_w5120_g1024_h512.tfrecords", "fake_w5120_g1024_h512.tfrecords", 1e-3)

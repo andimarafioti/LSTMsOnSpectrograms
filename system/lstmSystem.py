@@ -4,8 +4,10 @@ from utils.tfReader import TFReader
 
 
 class LSTMSystem(DNNSystem):
-	def __init__(self, architecture, batchSize, aPreProcessor, name):
-		self._windowSize = aPreProcessor.signalLength()
+	def __init__(self, architecture, batchSize, aPreProcessor, lstmParameters, name):
+		self._aPreProcessor = aPreProcessor
+		self._lstmParameters = lstmParameters
+		self._windowSize = lstmParameters.signalLength()
 		self._batchSize = batchSize
 		self._audio = tf.placeholder(tf.float32, shape=(batchSize, self._windowSize), name='audio_data')
 		self._inputAndTarget = aPreProcessor.inputAndTarget(self._audio)

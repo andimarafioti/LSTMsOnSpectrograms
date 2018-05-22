@@ -6,9 +6,6 @@ class LSTMPreAndPostProcessor(object):
 	def __init__(self, lstmParameters):
 		self._lstmParameters = lstmParameters
 
-	def signalLength(self):
-		return self._lstmParameters.signalLength()
-
 	def inputAndTarget(self, signal):
 		realAndImagStft = self._realAndImagStft(signal)
 
