@@ -40,10 +40,7 @@ class SimpleLSTMArchitecture(Architecture):
 
 	def _network(self, data, reuse=False):
 		with tf.variable_scope("Network", reuse=reuse):
-			rnn_cell = tf.contrib.rnn.MultiRNNCell(
-				[tf.contrib.rnn.BasicLSTMCell(self._lstmParams.lstmSize()),
-				tf.contrib.rnn.BasicLSTMCell(self._lstmParams.lstmSize()),
-				tf.contrib.rnn.BasicLSTMCell(self._lstmParams.lstmSize())])
+			rnn_cell = tf.contrib.rnn.BasicLSTMCell(self._lstmParams.lstmSize())
 
 			dataset = tf.reshape(data, (-1, self._lstmParams.fftFreqBins()))
 			dataset = tf.split(dataset, 4, -2)
