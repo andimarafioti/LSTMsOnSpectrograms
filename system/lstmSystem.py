@@ -29,8 +29,8 @@ class LSTMSystem(DNNSystem):
 			spectrograms = STFT
 			for i in range(length):
 				input_data = spectrograms[-self._lstmParameters.countOfFrames():]
-				feed_dict = {self._architecture.input(): input_data, self._architecture.isTraining(): False}
-				nextSpectrogram = sess.run(self._architecture.output(), feed_dict=feed_dict)
+				feed_dict = {self._architecture.testInput(): input_data, self._architecture.isTraining(): False}
+				nextSpectrogram = sess.run(self._architecture.generatedOutput(), feed_dict=feed_dict)
 				spectrograms = np.append(spectrograms, nextSpectrogram)
 			return spectrograms
 

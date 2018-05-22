@@ -9,6 +9,14 @@ class SimpleLSTMArchitecture(Architecture):
 			self._inputShape = inputShape
 			self._lstmParams = lstmParams
 			super().__init__()
+			self._testInput = tf.placeholder(tf.float32, shape=[4, 65], name='test_input_data')
+			self._generatedOutput = self._network(self._testInput, True)
+
+	def testInput(self):
+		return self._testInput
+
+	def generatedOutput(self):
+		return self._generatedOutput
 
 	def inputShape(self):
 		return self._inputShape
@@ -31,8 +39,8 @@ class SimpleLSTMArchitecture(Architecture):
 
 			return total_loss
 
-	def _network(self, data):
-		with tf.variable_scope("Network", reuse=False):
+	def _network(self, data, reuse=False):
+		with tf.variable_scope("Network", reuse=reuse):
 			rnn_cell = tf.contrib.rnn.BasicLSTMCell(self._lstmParams.lstmSize())
 
 			dataset = tf.reshape(data, (-1, self._lstmParams.fftFreqBins()))
