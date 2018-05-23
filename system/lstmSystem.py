@@ -28,15 +28,15 @@ class LSTMSystem(DNNSystem):
 
 			inputShape = list(STFT.shape)
 			outputShape = inputShape
-			outputShape[0] = self._lstmParameters.countOfFrames() + length
+			outputShape[0] += length
 			spectrograms = np.zeros(outputShape, dtype=np.float32)
-			spectrograms[:self._lstmParameters.countOfFrames()] = STFT[:self._lstmParameters.countOfFrames()]
+			spectrograms[:inputShape[0]] = STFT[:inputShape[0]]
 			for i in range(length):
-				next_frame = self._lstmParameters.countOfFrames() + i
-				input_data = spectrograms[next_frame-self._lstmParameters.countOfFrames():next_frame]
+				next_frame = inputShape[0] + i
+				input_data = spectrograms[next_frame-inputShape[0]:next_frame]
 				feed_dict = {self._architecture.testInput(): input_data, self._architecture.isTraining(): False}
 				nextSpectrogram = sess.run(self._architecture.generatedOutput(), feed_dict=feed_dict)
-				spectrograms[self._lstmParameters.countOfFrames()+i] = nextSpectrogram
+				spectrograms[inputShape[0]+i] = nextSpectrogram
 			return spectrograms
 
 	def optimizer(self, learningRate):
