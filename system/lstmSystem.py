@@ -34,7 +34,7 @@ class LSTMSystem(DNNSystem):
 			for i in range(length):
 				next_frame = inputShape[0] + i
 				input_data = spectrograms[next_frame-inputShape[0]:next_frame]
-				feed_dict = {self._architecture.testInput(): input_data, self._architecture.isTraining(): False}
+				feed_dict = {self._architecture.testInput(): [input_data], self._architecture.isTraining(): False}
 				nextSpectrogram = sess.run(self._architecture.generatedOutput(), feed_dict=feed_dict)
 				spectrograms[inputShape[0]+i] = nextSpectrogram
 			return spectrograms

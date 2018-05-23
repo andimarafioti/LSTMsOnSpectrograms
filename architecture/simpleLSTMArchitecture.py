@@ -8,7 +8,7 @@ class SimpleLSTMArchitecture(Architecture):
 			self._inputShape = inputShape
 			self._lstmParams = lstmParams
 			super().__init__()
-			self._testInput = tf.placeholder(tf.float32, shape=[1, lstmParams.countOfFrames(), lstmParams.fftFreqBins()],
+			self._testInput = tf.placeholder(tf.float32, shape=[1, lstmParams.fftFrames(), lstmParams.fftFreqBins()],
 											 name='test_input_data')
 			self._generatedOutput = self._network(self._testInput, True)
 
