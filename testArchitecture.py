@@ -4,14 +4,17 @@ from system.lstmPreAndPostProcessor import LSTMPreAndPostProcessor
 from system.lstmSystem import LSTMSystem
 
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-sessionsName = "baseline_oneframe_"
+sessionsName = "test_newArch_"
 
-params = LstmParameters(lstmSize=512, signalLength=5120, fftWindowLength=128, fftHopSize=32, countOfFrames=1)
-batch_size = 1
+batch_size = 64
+params = LstmParameters(lstmSize=512, batchSize=batch_size, signalLength=5120, fftWindowLength=128, fftHopSize=32,
+						countOfFrames=4)
 
-aContextEncoderArchitecture = SimpleLSTMArchitecture(inputShape=(params.inputFrames(), params.fftFreqBins()), lstmParams=params)
+aContextEncoderArchitecture = SimpleLSTMArchitecture(inputShape=(params.batchSize(),
+																 params.fftFrames()-1,
+																 params.fftFreqBins()), lstmParams=params)
 
 aPreProcessor = LSTMPreAndPostProcessor(params)
 

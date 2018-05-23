@@ -8,7 +8,7 @@ class SimpleLSTMArchitecture(Architecture):
 			self._inputShape = inputShape
 			self._lstmParams = lstmParams
 			super().__init__()
-			self._testInput = tf.placeholder(tf.float32, shape=[lstmParams.countOfFrames(), lstmParams.fftFreqBins()],
+			self._testInput = tf.placeholder(tf.float32, shape=[1, lstmParams.countOfFrames(), lstmParams.fftFreqBins()],
 											 name='test_input_data')
 			self._generatedOutput = self._network(self._testInput, True)
 
@@ -42,8 +42,8 @@ class SimpleLSTMArchitecture(Architecture):
 	def _network(self, data, reuse=False):
 		with tf.variable_scope("Network", reuse=reuse):
 			rnn_cell = tf.contrib.rnn.BasicLSTMCell(self._lstmParams.lstmSize())
-
-			dataset = tf.split(data, self._lstmParams.countOfFrames(), -2)
+			# dataset = tf.split(data, int(self._lstmParams.fftFrames()-1), -2)
+			dataset = tf.unstack(data, axis=-2)
 
 			outputs, states = tf.nn.static_rnn(rnn_cell, dataset, dtype=tf.float32)
 

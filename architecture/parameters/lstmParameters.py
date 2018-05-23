@@ -1,6 +1,7 @@
 class LstmParameters(object):
-	def __init__(self, lstmSize, signalLength, fftWindowLength, fftHopSize, countOfFrames):
+	def __init__(self, lstmSize, batchSize, signalLength, fftWindowLength, fftHopSize, countOfFrames):
 		self._signalLength = signalLength
+		self._batchSize = batchSize
 		self._lstmSize = lstmSize
 		self._fftWindowLength = fftWindowLength
 		self._fftHopSize = fftHopSize
@@ -8,6 +9,9 @@ class LstmParameters(object):
 
 	def signalLength(self):
 		return self._signalLength
+
+	def batchSize(self):
+		return self._batchSize
 
 	def countOfFrames(self):
 		return self._countOfFrames
