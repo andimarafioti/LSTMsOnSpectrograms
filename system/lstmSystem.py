@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import copy
 from system.dnnSystem import DNNSystem
 from utils.tfReader import TFReader
 
@@ -27,16 +28,17 @@ class LSTMSystem(DNNSystem):
 			sess.run([tf.local_variables_initializer()])
 
 			inputShape = list(STFT.shape)
-			outputShape = inputShape
+			outputShape = copy.copy(inputShape)
 			outputShape[0] += length
 			spectrograms = np.zeros(outputShape, dtype=np.float32)
 			spectrograms[:inputShape[0]] = STFT[:inputShape[0]]
 			for i in range(length):
+				first_frame_to_feed = i
 				next_frame = inputShape[0] + i
-				input_data = spectrograms[next_frame-inputShape[0]:next_frame]
+				input_data = spectrograms[first_frame_to_feed:next_frame]
 				feed_dict = {self._architecture.testInput(): [input_data], self._architecture.isTraining(): False}
 				nextSpectrogram = sess.run(self._architecture.generatedOutput(), feed_dict=feed_dict)
-				spectrograms[inputShape[0]+i] = nextSpectrogram
+				spectrograms[next_frame] = nextSpectrogram
 			return spectrograms
 
 	def optimizer(self, learningRate):
