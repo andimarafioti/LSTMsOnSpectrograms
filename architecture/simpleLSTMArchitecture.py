@@ -8,15 +8,16 @@ class SimpleLSTMArchitecture(Architecture):
 			self._inputShape = inputShape
 			self._lstmParams = lstmParams
 			super().__init__()
-			self._testInput = tf.placeholder(tf.float32, shape=[1, lstmParams.fftFrames(), lstmParams.fftFreqBins()],
-											 name='test_input_data')
-			self._generatedOutput = self._network(self._testInput, True)
 
-	def testInput(self):
-		return self._testInput
+	def generateXOutputs(self, seedInput, length):
+		assert length > 0
+		with tf.variable_scope("LSTMArchitecture"):
 
-	def generatedOutput(self):
-		return self._generatedOutput
+			for i in range(length):
+				intermediateOutput = self._network(seedInput[int(-self._lstmParams.fftFrames()+i):], reuse=True)
+				seedInput = tf.concat([seedInput, [intermediateOutput]], axis=1)
+
+			return seedInput[0]
 
 	def inputShape(self):
 		return self._inputShape

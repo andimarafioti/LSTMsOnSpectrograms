@@ -15,6 +15,7 @@ class LSTMSystem(DNNSystem):
 		self._inputAndTarget = aPreProcessor.inputAndTarget(self._audio)
 		super().__init__(architecture, name)
 		self._SNR = tf.reduce_mean(self._pavlovs_SNR(self._architecture.output(), self._architecture.target(), onAxis=[1]))
+		# self._spectrogramImageSummary = self._spectrogramImageSummary()
 
 	def generate(self, STFT, length=100, model_num=None):
 		with tf.Session() as sess:
@@ -27,19 +28,10 @@ class LSTMSystem(DNNSystem):
 			print("Model restored.")
 			sess.run([tf.local_variables_initializer()])
 
-			inputShape = list(STFT.shape)
-			outputShape = copy.copy(inputShape)
-			outputShape[0] += length
-			spectrograms = np.zeros(outputShape, dtype=np.float32)
-			spectrograms[:inputShape[0]] = STFT[:inputShape[0]]
-			for i in range(length):
-				first_frame_to_feed = i
-				next_frame = inputShape[0] + i
-				input_data = spectrograms[first_frame_to_feed:next_frame]
-				feed_dict = {self._architecture.testInput(): [input_data], self._architecture.isTraining(): False}
-				nextSpectrogram = sess.run(self._architecture.generatedOutput(), feed_dict=feed_dict)
-				spectrograms[next_frame] = nextSpectrogram
-			return spectrograms
+			feed_dict = {self._architecture.isTraining(): False}
+			generatedSpectrograms = sess.run(self._architecture.generateXOutputs(np.array([STFT]), length), feed_dict=feed_dict)
+
+			return generatedSpectrograms
 
 	def optimizer(self, learningRate):
 		update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
@@ -47,10 +39,18 @@ class LSTMSystem(DNNSystem):
 			return tf.train.AdamOptimizer(learning_rate=learningRate).minimize(self._architecture.loss())
 
 	def _feedDict(self, data, sess, isTraining=True):
-		net_input, net_target = sess.run(self._inputAndTarget,
-										feed_dict={self._audio: data})
+		net_input, net_target = sess.run(self._inputAndTarget, feed_dict={self._audio: data})
 		return {self._architecture.input(): net_input, self._architecture.target(): net_target,
 				self._architecture.isTraining(): isTraining}
+
+	def _spectrogramImageSummary(self, net_input):
+		originalAndGeneratedSpectrogram = self._generate(net_input, length=50, sess=sess)
+		originalImage = originalAndGeneratedSpectrogram[:self._lstmParameters.fftFrames()]
+		generatedImage = originalAndGeneratedSpectrogram[self._lstmParameters.fftFrames():]
+
+		return tf.summary.merge([tf.summary.image("Original", originalImage),
+								tf.summary.image("Generated", generatedImage),
+								tf.summary.image("Complete", originalAndGeneratedSpectrogram)])
 
 	def _evaluate(self, summariesDict, feed_dict, validReader, sess):
 		trainSNRSummaryToWrite = sess.run(summariesDict['train_SNR_summary'], feed_dict=feed_dict)
@@ -70,7 +70,8 @@ class LSTMSystem(DNNSystem):
 
 	def _evaluationSummaries(self):
 		summaries_dict = {'train_SNR_summary': tf.summary.scalar("training_SNR", self._SNR),
-						  'valid_SNR_summary': tf.summary.scalar("validation_SNR", self._SNR)}
+						  'valid_SNR_summary': tf.summary.scalar("validation_SNR", self._SNR),
+						  'image_summaries': self._spectrogramImageSummary()}
 		return summaries_dict
 
 	def _squaredEuclideanNorm(self, tensor, onAxis=[1, 2, 3]):
