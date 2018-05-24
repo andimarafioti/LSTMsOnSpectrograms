@@ -70,8 +70,7 @@ class LSTMSystem(DNNSystem):
 
 	def _evaluationSummaries(self):
 		summaries_dict = {'train_SNR_summary': tf.summary.scalar("training_SNR", self._SNR),
-						  'valid_SNR_summary': tf.summary.scalar("validation_SNR", self._SNR),
-						  'image_summaries': self._spectrogramImageSummary()}
+						  'valid_SNR_summary': tf.summary.scalar("validation_SNR", self._SNR)}
 		return summaries_dict
 
 	def _squaredEuclideanNorm(self, tensor, onAxis=[1, 2, 3]):
