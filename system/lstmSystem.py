@@ -43,10 +43,10 @@ class LSTMSystem(DNNSystem):
 		return {self._architecture.input(): net_input, self._architecture.target(): net_target,
 				self._architecture.isTraining(): isTraining}
 
-	def _spectrogramImageSummary(self, net_input):
-		originalAndGeneratedSpectrogram = self._generate(net_input, length=50, sess=sess)
-		originalImage = originalAndGeneratedSpectrogram[:self._lstmParameters.fftFrames()]
-		generatedImage = originalAndGeneratedSpectrogram[self._lstmParameters.fftFrames():]
+	def _spectrogramImageSummary(self):
+		originalAndGeneratedSpectrogram = self._architecture.generateXOutputs(np.array([self._architecture.input()[0]]), 12)
+		originalImage = tf.transpose(originalAndGeneratedSpectrogram[:self._lstmParameters.fftFrames()])
+		generatedImage = tf.transpose(originalAndGeneratedSpectrogram[self._lstmParameters.fftFrames():])
 
 		return tf.summary.merge([tf.summary.image("Original", originalImage),
 								tf.summary.image("Generated", generatedImage),
@@ -70,7 +70,8 @@ class LSTMSystem(DNNSystem):
 
 	def _evaluationSummaries(self):
 		summaries_dict = {'train_SNR_summary': tf.summary.scalar("training_SNR", self._SNR),
-						  'valid_SNR_summary': tf.summary.scalar("validation_SNR", self._SNR)}
+						'valid_SNR_summary': tf.summary.scalar("validation_SNR", self._SNR),
+						'image_summaries': self._spectrogramImageSummary()}
 		return summaries_dict
 
 	def _squaredEuclideanNorm(self, tensor, onAxis=[1, 2, 3]):
