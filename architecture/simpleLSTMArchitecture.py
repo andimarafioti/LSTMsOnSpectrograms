@@ -44,7 +44,6 @@ class SimpleLSTMArchitecture(Architecture):
 		with tf.variable_scope("Network", reuse=reuse):
 			rnn_cell = tf.contrib.rnn.BasicLSTMCell(self._lstmParams.lstmSize())
 			# dataset = tf.split(data, int(self._lstmParams.fftFrames()-1), -2)
-			print(data.shape)
 			dataset = tf.unstack(data, axis=-2)
 
 			outputs, states = tf.nn.static_rnn(rnn_cell, dataset, dtype=tf.float32)
