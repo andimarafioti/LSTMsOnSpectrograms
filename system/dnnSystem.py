@@ -27,7 +27,7 @@ class DNNSystem(object):
     def train(self, trainTFRecordPath, validTFRecordPath, learningRate, numSteps=6e5, restoreNum=None):
         with tf.Session() as sess:
             trainReader = self._loadReader(trainTFRecordPath)
-            validReader = self._loadReader(validTFRecordPath)
+            validReader = self._loadReader(validTFRecordPath, capacity=int(2e5))
             optimizer = self.optimizer(learningRate)
 
             saver = tf.train.Saver(max_to_keep=100)

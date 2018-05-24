@@ -65,8 +65,8 @@ class LSTMSystem(DNNSystem):
 
 		return [trainSNRSummaryToWrite, validSNRSummary]
 
-	def _loadReader(self, dataPath):
-		return TFReader(dataPath, self._windowSize, batchSize=self._batchSize, capacity=int(2e5), num_epochs=400)
+	def _loadReader(self, dataPath, capacity=int(1e6)):
+		return TFReader(dataPath, self._windowSize, batchSize=self._batchSize, capacity=capacity, num_epochs=400)
 
 	def _evaluationSummaries(self):
 		summaries_dict = {'train_SNR_summary': tf.summary.scalar("training_SNR", self._SNR),
