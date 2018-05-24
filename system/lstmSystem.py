@@ -45,6 +45,8 @@ class LSTMSystem(DNNSystem):
 
 	def _spectrogramImageSummary(self):
 		originalAndGeneratedSpectrogram = self._architecture.generateXOutputs(np.array([self._architecture.input()[0]]), 12)
+		originalAndGeneratedSpectrogram = tf.reshape(originalAndGeneratedSpectrogram,
+													[1, *originalAndGeneratedSpectrogram.shape.as_list(), 1])
 		originalImage = tf.transpose(originalAndGeneratedSpectrogram[:self._lstmParameters.fftFrames()])
 		generatedImage = tf.transpose(originalAndGeneratedSpectrogram[self._lstmParameters.fftFrames():])
 
