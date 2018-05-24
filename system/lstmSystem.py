@@ -62,8 +62,9 @@ class LSTMSystem(DNNSystem):
 			return [trainSNRSummaryToWrite]
 		feed_dict = self._feedDict(audio, sess, False)
 		validSNRSummary = sess.run(summariesDict['valid_SNR_summary'], feed_dict)
+		imageSummary = sess.run(summariesDict['image_summaries'], feed_dict)
 
-		return [trainSNRSummaryToWrite, validSNRSummary]
+		return [trainSNRSummaryToWrite, validSNRSummary, imageSummary]
 
 	def _loadReader(self, dataPath, capacity=int(1e6)):
 		return TFReader(dataPath, self._windowSize, batchSize=self._batchSize, capacity=capacity, num_epochs=400)
