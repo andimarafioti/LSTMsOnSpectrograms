@@ -1,10 +1,10 @@
 from architecture.parameters.lstmParameters import LstmParameters
 from architecture.realImagLSTMArchitecture import RealImagLSTMArchitecture
-from system.lstmSystem import LSTMSystem
 
 import os
 
 from system.realImagLSTMPreAndPostProcessor import RealImagLSTMPreAndPostProcessor
+from system.realImagLSTMSystem import RealImagLSTMSystem
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
@@ -20,6 +20,6 @@ aContextEncoderArchitecture = RealImagLSTMArchitecture(inputShape=(params.batchS
 
 aPreProcessor = RealImagLSTMPreAndPostProcessor(params)
 
-aContextEncoderSystem = LSTMSystem(aContextEncoderArchitecture, batch_size, aPreProcessor, params, sessionsName)
+aContextEncoderSystem = RealImagLSTMSystem(aContextEncoderArchitecture, batch_size, aPreProcessor, params, sessionsName)
 
 aContextEncoderSystem.train("../variationalAutoEncoder/fake_w5120_g1024_h512.tfrecords", "../variationalAutoEncoder/fake_w5120_g1024_h512.tfrecords", 1e-3)
