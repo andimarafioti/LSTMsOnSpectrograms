@@ -22,4 +22,4 @@ aPreProcessor = RealImagLSTMPreAndPostProcessor(params)
 
 aContextEncoderSystem = LSTMSystem(aContextEncoderArchitecture, batch_size, aPreProcessor, params, sessionsName)
 
-aContextEncoderSystem.train("fake_w5120_g1024_h512.tfrecords", "fake_w5120_g1024_h512.tfrecords", 1e-3)
+aContextEncoderSystem.train("../variationalAutoEncoder/fake_w5120_g1024_h512.tfrecords", "../variationalAutoEncoder/fake_w5120_g1024_h512.tfrecords", 1e-3)
