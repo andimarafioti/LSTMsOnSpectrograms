@@ -66,7 +66,7 @@ class DNNSystem(object):
                     if step % 40 == 0:
                         train_summ = sess.run(self._architecture.lossSummaries(), feed_dict=feed_dict)
                         writer.add_summary(train_summ, _modelNum + step)
-                    if step % 20 == 0:
+                    if step % 2000 == 0:
                         summaries = self._evaluate(summariesDict, feed_dict, validReader, sess)
                         for summary in summaries:
                             writer.add_summary(summary, _modelNum+step)
