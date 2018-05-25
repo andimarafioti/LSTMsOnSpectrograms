@@ -45,17 +45,20 @@ class LSTMSystem(DNNSystem):
 				self._architecture.isTraining(): isTraining}
 
 	def _spectrogramImageSummary(self):
-		originalAndGeneratedSpectrogram = self._architecture.generateXOutputs(self._architecture.input(), 12)
+		frames = 12
+		originalAndGeneratedSpectrogram = self._architecture.generateXOutputs(self._architecture.input(), frames)
 		originalAndGeneratedSpectrogram = tf.transpose(originalAndGeneratedSpectrogram)
 		originalAndGeneratedSpectrogram = colorize(originalAndGeneratedSpectrogram)
 		originalAndGeneratedSpectrogram = tf.expand_dims(originalAndGeneratedSpectrogram, 0)
 
-		originalImage = originalAndGeneratedSpectrogram[:, :, :int(self._lstmParameters.fftFrames()), :]
+		originalImage = originalAndGeneratedSpectrogram[:, :, int(self._lstmParameters.fftFrames()) -
+															frames:int(self._lstmParameters.fftFrames()), :]
 		generatedImage = originalAndGeneratedSpectrogram[:, :, int(self._lstmParameters.fftFrames()):, :]
 
 		return tf.summary.merge([tf.summary.image("Original", originalImage),
 								tf.summary.image("Generated", generatedImage),
-								tf.summary.image("Complete", originalAndGeneratedSpectrogram)])
+								tf.summary.image("Complete", originalAndGeneratedSpectrogram[
+															:, :, int(self._lstmParameters.fftFrames())-frames:, :])])
 
 	def _evaluate(self, summariesDict, feed_dict, validReader, sess):
 		trainSNRSummaryToWrite = sess.run(summariesDict['train_SNR_summary'], feed_dict=feed_dict)
