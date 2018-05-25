@@ -7,8 +7,8 @@ class RealImagLSTMSystem(LSTMSystem):
 	def _spectrogramImageSummary(self):
 		frames = 12
 		originalAndGeneratedSpectrogram = self._architecture.generateXOutputs(self._architecture.input(), frames)
-		originalAndGeneratedSpectrogram = tf.abs(
-			originalAndGeneratedSpectrogram[:, :, 0] + 1.0j * originalAndGeneratedSpectrogram[:, :, 1])
+		originalAndGeneratedSpectrogram = tf.abs(tf.real(
+			originalAndGeneratedSpectrogram[:, :, 0]) + tf.imag(originalAndGeneratedSpectrogram[:, :, 1]))
 		originalAndGeneratedSpectrogram = tf.transpose(originalAndGeneratedSpectrogram)
 		originalAndGeneratedSpectrogram = colorize(originalAndGeneratedSpectrogram)
 		originalAndGeneratedSpectrogram = tf.expand_dims(originalAndGeneratedSpectrogram, 0)
