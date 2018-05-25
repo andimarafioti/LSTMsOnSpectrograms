@@ -2,6 +2,7 @@ import matplotlib
 import matplotlib.cm
 
 import tensorflow as tf
+import numpy as np
 
 
 def colorize(value, vmin=None, vmax=None, cmap=None):
@@ -42,7 +43,7 @@ def colorize(value, vmin=None, vmax=None, cmap=None):
 
 	# gather
 	cm = matplotlib.cm.get_cmap(cmap if cmap is not None else 'gray')
-	colors = cm(range(256))[:, :3]
+	colors = cm(np.arange(256))[:, :3]
 	colors = tf.constant(colors, dtype=tf.float32)
 	value = tf.gather(colors, indices)
 
