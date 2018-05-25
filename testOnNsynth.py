@@ -6,9 +6,9 @@ from system.lstmSystem import LSTMSystem
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-sessionsName = "nsynth_batch128_"
+sessionsName = "nsynth_"
 
-batch_size = 128
+batch_size = 64
 params = LstmParameters(lstmSize=512, batchSize=batch_size, signalLength=5120, fftWindowLength=128, fftHopSize=32,
 						countOfFrames=4)
 
