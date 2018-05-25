@@ -1,5 +1,5 @@
 from architecture.parameters.lstmParameters import LstmParameters
-from architecture.simpleLSTMArchitecture import SimpleLSTMArchitecture
+from architecture.realImagLSTMArchitecture import RealImagLSTMArchitecture
 from system.lstmSystem import LSTMSystem
 
 import os
@@ -14,9 +14,9 @@ batch_size = 64
 params = LstmParameters(lstmSize=512, batchSize=batch_size, signalLength=5120, fftWindowLength=128, fftHopSize=32,
 						countOfFrames=4)
 
-aContextEncoderArchitecture = SimpleLSTMArchitecture(inputShape=(params.batchSize(),
+aContextEncoderArchitecture = RealImagLSTMArchitecture(inputShape=(params.batchSize(),
 																 params.fftFrames()-1,
-																 params.fftFreqBins()), lstmParams=params)
+																 params.fftFreqBins(), 2), lstmParams=params)
 
 aPreProcessor = RealImagLSTMPreAndPostProcessor(params)
 
