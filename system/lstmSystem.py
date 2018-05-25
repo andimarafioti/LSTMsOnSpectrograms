@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 import copy
 from system.dnnSystem import DNNSystem
+from utils.colorize import colorize
 from utils.tfReader import TFReader
 
 
@@ -45,13 +46,12 @@ class LSTMSystem(DNNSystem):
 
 	def _spectrogramImageSummary(self):
 		originalAndGeneratedSpectrogram = self._architecture.generateXOutputs(self._architecture.input(), 12)
-		print(originalAndGeneratedSpectrogram.shape.as_list())
-		originalAndGeneratedSpectrogram = tf.reshape(originalAndGeneratedSpectrogram,
-													[1, *originalAndGeneratedSpectrogram.shape.as_list(), 1])
-		print(originalAndGeneratedSpectrogram.shape.as_list())
+		originalAndGeneratedSpectrogram = tf.transpose(originalAndGeneratedSpectrogram)
+		originalAndGeneratedSpectrogram = colorize(originalAndGeneratedSpectrogram)
+		originalAndGeneratedSpectrogram = tf.expand_dims(originalAndGeneratedSpectrogram, 0)
 
-		originalImage = tf.transpose(originalAndGeneratedSpectrogram[:, int(self._lstmParameters.fftFrames()), :, :])
-		generatedImage = tf.transpose(originalAndGeneratedSpectrogram[:, int(self._lstmParameters.fftFrames()):, :, :])
+		originalImage = originalAndGeneratedSpectrogram[:, :, :int(self._lstmParameters.fftFrames()), :]
+		generatedImage = originalAndGeneratedSpectrogram[:, :, int(self._lstmParameters.fftFrames()):, :]
 
 		return tf.summary.merge([tf.summary.image("Original", originalImage),
 								tf.summary.image("Generated", generatedImage),
