@@ -52,8 +52,8 @@ class LSTMSystem(DNNSystem):
 		originalAndGeneratedSpectrogram = tf.expand_dims(originalAndGeneratedSpectrogram, 0)
 
 		originalImage = originalAndGeneratedSpectrogram[:, :, int(self._lstmParameters.fftFrames()) -
-															frames:int(self._lstmParameters.fftFrames()), :]
-		generatedImage = originalAndGeneratedSpectrogram[:, :, int(self._lstmParameters.fftFrames()):, :]
+															frames-1:int(self._lstmParameters.fftFrames())-1, :]
+		generatedImage = originalAndGeneratedSpectrogram[:, :, int(self._lstmParameters.fftFrames())-1:, :]
 
 		return tf.summary.merge([tf.summary.image("Original", originalImage),
 								tf.summary.image("Generated", generatedImage),
