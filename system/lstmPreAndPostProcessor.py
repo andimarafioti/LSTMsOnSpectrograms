@@ -14,16 +14,6 @@ class LSTMPreAndPostProcessor(object):
 
 		return netInput, target
 
-		# netInput = np.empty([0, self._lstmParameters.fftFreqBins()])
-		# target = np.empty([0, self._lstmParameters.fftFreqBins()])
-		# frames_width = self._lstmParameters.countOfFrames()
-		#
-		# for step in range(realAndImagStft.shape.as_list()[-2]-frames_width-1):
-		# 	netInput = tf.concat([netInput, realAndImagStft[0, step:step + frames_width, :]], -2)
-		# 	target = tf.concat([target, realAndImagStft[0, step + frames_width + 1:step + frames_width + 2, :]], -2)
-		#
-		# return netInput, target
-
 	def _realAndImagStft(self, signal):
 		stft = tf.contrib.signal.stft(signals=signal,
 									  frame_length=self._lstmParameters.fftWindowLength(),
