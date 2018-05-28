@@ -1,18 +1,9 @@
 import tensorflow as tf
 
+from system.lstmPreAndPostProcessor import LSTMPreAndPostProcessor
 
-class RealImagLSTMPreAndPostProcessor(object):
-	def __init__(self, lstmParameters):
-		self._lstmParameters = lstmParameters
 
-	def inputAndTarget(self, signal):
-		realAndImagStft = self._realAndImagStft(signal)
-
-		netInput = realAndImagStft[:, :-1, :]
-		target = realAndImagStft[:, -1, :]
-
-		return netInput, target
-
+class RealImagLSTMPreAndPostProcessor(LSTMPreAndPostProcessor):
 	def _realAndImagStft(self, signal):
 		stft = tf.contrib.signal.stft(signals=signal,
 									  frame_length=self._lstmParameters.fftWindowLength(),
