@@ -30,10 +30,10 @@ class SimpleLSTMArchitecture(Architecture):
 
 	def _lossGraph(self):
 		with tf.variable_scope("Loss"):
-			targetSquaredNorm = tf.reduce_sum(tf.square(self._target), axis=[1])
+			targetSquaredNorm = tf.reduce_sum(tf.square(self._target), axis=[1, 2])
 
 			error = self._target - self._output
-			error_per_example = tf.reduce_sum(tf.square(error), axis=[1])
+			error_per_example = tf.reduce_sum(tf.square(error), axis=[1, 2])
 
 			reconstruction_loss = 0.5 * tf.reduce_sum(error_per_example * (1 + 5 / (targetSquaredNorm + 1e-4)))
 			lossL2 = tf.add_n([tf.nn.l2_loss(v) for v in tf.trainable_variables()]) * 1e-5
