@@ -6,7 +6,7 @@ from utils.colorize import colorize
 class RealImagLSTMSystem(LSTMSystem):
 	def _spectrogramImageSummary(self):
 		frames = 12
-		originalAndGeneratedSpectrogram = self._architecture.generateXOutputs(self._architecture.input(), frames)
+		originalAndGeneratedSpectrogram = self._architecture.generateXOutputs(self._architecture.input(), frames)[0]
 		originalAndGeneratedSpectrogram = tf.square(originalAndGeneratedSpectrogram[:, :, 0]) + \
 										  tf.square(originalAndGeneratedSpectrogram[:, :, 1])
 		originalAndGeneratedSpectrogram = tf.transpose(originalAndGeneratedSpectrogram)
