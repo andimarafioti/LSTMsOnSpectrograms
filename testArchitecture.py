@@ -6,7 +6,7 @@ from system.lstmSystem import LSTMSystem
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-sessionsName = "test_newArch_"
+sessionsName = "test_newNewArch_"
 
 batch_size = 64
 params = LstmParameters(lstmSize=512, batchSize=batch_size, signalLength=5120, fftWindowLength=128, fftHopSize=32,
