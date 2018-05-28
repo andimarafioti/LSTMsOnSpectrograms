@@ -9,7 +9,7 @@ class LSTMPreAndPostProcessor(object):
 		realAndImagStft = self._realAndImagStft(signal)
 
 		netInput = realAndImagStft[:, :-1, :]
-		target = realAndImagStft[:, 0:, :]
+		target = realAndImagStft[:, 1:, :]
 
 		return netInput, target
 
