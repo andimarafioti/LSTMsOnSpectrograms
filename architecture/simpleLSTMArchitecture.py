@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 from architecture.architecture import Architecture
 
 
@@ -7,17 +8,22 @@ class SimpleLSTMArchitecture(Architecture):
 		with tf.variable_scope("LSTMArchitecture"):
 			self._inputShape = inputShape
 			self._lstmParams = lstmParams
+			self._state = None
 			super().__init__()
 
 	def generateXOutputs(self, seedInput, length):
 		assert length > 0
 		with tf.variable_scope("LSTMArchitecture"):
+			self._state = None
 
-			for i in range(length):
-				intermediateOutput = self._network(seedInput[int(-self._lstmParams.fftFrames()+i):], reuse=True)
-				seedInput = tf.concat([seedInput, tf.expand_dims(intermediateOutput, 1)], axis=1)
+			intermediateOutput = self._network(seedInput[int(-self._lstmParams.fftFrames()):], reuse=True)
+			seedInput = tf.concat([seedInput, intermediateOutput[:, -1:, :]], axis=1)
 
-			return seedInput[0]
+			for i in range(1, length):
+				intermediateOutput = self._network(seedInput[:, -1:, :], initial_state=self._state, reuse=True)
+				seedInput = tf.concat([seedInput, intermediateOutput[:, -1:, :]], axis=1)
+
+			return seedInput
 
 	def inputShape(self):
 		return self._inputShape
@@ -40,21 +46,23 @@ class SimpleLSTMArchitecture(Architecture):
 
 			return total_loss
 
-	def _network(self, data, reuse=False):
+	def _network(self, data, initial_state=None, reuse=False):
 		with tf.variable_scope("Network", reuse=reuse):
 			rnn_cell = tf.contrib.rnn.BasicLSTMCell(self._lstmParams.lstmSize())
 			# dataset = tf.split(data, int(self._lstmParams.fftFrames()-1), -2)
 			dataset = tf.unstack(data, axis=-2)
 
-			outputs, states = tf.nn.static_rnn(rnn_cell, dataset, dtype=tf.float32)
+			outputs, self._state = tf.nn.static_rnn(rnn_cell, dataset, initial_state=initial_state, dtype=tf.float32)
 
-			# there are n_input outputs but
-			# we only want the last output
-			output = tf.matmul(outputs[-1], self._weight_variable(
-				[self._lstmParams.lstmSize(), self._lstmParams.fftFreqBins()])) + self._bias_variable(
-				[self._lstmParams.fftFreqBins()])
-			return tf.reshape(output, [-1, self._lstmParams.fftFreqBins()])
+			out_output = np.empty([data.shape[0], 0, self._lstmParams.fftFreqBins()])
+			weights = self._weight_variable([self._lstmParams.lstmSize(), self._lstmParams.fftFreqBins()])
+			biases = self._bias_variable([self._lstmParams.fftFreqBins()])
 
+			for output in outputs:
+				mat_muled = tf.matmul(output, weights) + biases
+				output = tf.reshape(mat_muled, [-1, 1, self._lstmParams.fftFreqBins()])
+				out_output = tf.concat([out_output, output], axis=1)
+			return out_output
 
 	def _weight_variable(self, shape):
 		return tf.get_variable('W', shape, initializer=tf.contrib.layers.xavier_initializer())
