@@ -16,7 +16,7 @@ class SimpleLSTMArchitecture(Architecture):
 		with tf.variable_scope("LSTMArchitecture"):
 			self._state = None
 
-			intermediateOutput = self._network(seedInput[:, int(-self._lstmParams.fftFrames()):], reuse=True)
+			intermediateOutput = self._network(seedInput[:, int(-self._lstmParams.fftFrames()):, :], reuse=True)
 			seedInput = tf.concat([seedInput, intermediateOutput[:, -1:, :]], axis=1)
 
 			for i in range(1, length):
