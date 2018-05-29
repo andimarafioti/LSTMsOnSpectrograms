@@ -16,7 +16,7 @@ class SimpleLSTMArchitecture(Architecture):
 		with tf.variable_scope("LSTMArchitecture"):
 			self._state = None
 
-			intermediateOutput = self._network(seedInput[int(-self._lstmParams.fftFrames()):], reuse=True)
+			intermediateOutput = self._network(seedInput[:, int(-self._lstmParams.fftFrames()):], reuse=True)
 			seedInput = tf.concat([seedInput, intermediateOutput[:, -1:, :]], axis=1)
 
 			for i in range(1, length):
@@ -30,6 +30,8 @@ class SimpleLSTMArchitecture(Architecture):
 
 	def _lossGraph(self):
 		with tf.variable_scope("Loss"):
+			# normalize values !! divide by max input and multiply output
+
 			targetSquaredNorm = tf.reduce_sum(tf.square(self._target), axis=[1, 2])
 
 			error = self._target - self._output
