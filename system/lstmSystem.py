@@ -18,7 +18,7 @@ class LSTMSystem(DNNSystem):
 		self._SNR = tf.reduce_mean(self._pavlovs_SNR(self._architecture.output(), self._architecture.target(), onAxis=[1, 2]))
 		# self._spectrogramImageSummary = self._spectrogramImageSummary()
 
-	def generate(self, STFT, length=100, model_num=None):
+	def generate(self, STFTs, length=100, model_num=None):
 		with tf.Session() as sess:
 			if model_num is not None:
 				path = self.modelsPath(model_num)
@@ -30,7 +30,7 @@ class LSTMSystem(DNNSystem):
 			sess.run([tf.local_variables_initializer()])
 
 			feed_dict = {self._architecture.isTraining(): False}
-			generatedSpectrograms = sess.run(self._architecture.generateXOutputs(np.array([STFT]), length), feed_dict=feed_dict)
+			generatedSpectrograms = sess.run(self._architecture.generateXOutputs(STFTs, length), feed_dict=feed_dict)
 
 			return generatedSpectrograms
 
