@@ -48,13 +48,33 @@ class SimpleLSTMArchitecture(Architecture):
 
 			return total_loss
 
-	def _network(self, data, initial_state=None, reuse=False):
-		with tf.variable_scope("Network", reuse=reuse):
-			rnn_cell = tf.contrib.rnn.BasicLSTMCell(self._lstmParams.lstmSize())
-			# dataset = tf.split(data, int(self._lstmParams.fftFrames()-1), -2)
+	# def _network(self, data, initial_state=None, reuse=False):
+	# 	with tf.variable_scope("Network", reuse=reuse):
+	# 		rnn_cell = tf.contrib.rnn.BasicLSTMCell(self._lstmParams.lstmSize())
+	# 		# dataset = tf.split(data, int(self._lstmParams.fftFrames()-1), -2)
+	# 		dataset = tf.unstack(data, axis=-2)
+    #
+	# 		outputs, self._state = tf.nn.static_rnn(rnn_cell, dataset, initial_state=initial_state, dtype=tf.float32)
+    #
+	# 		out_output = np.empty([data.shape[0], 0, self._lstmParams.fftFreqBins()])
+	# 		weights = self._weight_variable([self._lstmParams.lstmSize(), self._lstmParams.fftFreqBins()])
+	# 		biases = self._bias_variable([self._lstmParams.fftFreqBins()])
+    #
+	# 		for output in outputs:
+	# 			mat_muled = tf.matmul(output, weights) + biases
+	# 			output = tf.reshape(mat_muled, [-1, 1, self._lstmParams.fftFreqBins()])
+	# 			out_output = tf.concat([out_output, output], axis=1)
+	# 		return out_output
+
+	def _lstmNetwork(self, data, initial_state, reuse, name):
+		with tf.variable_scope(name, reuse=reuse):
 			dataset = tf.unstack(data, axis=-2)
 
-			outputs, self._state = tf.nn.static_rnn(rnn_cell, dataset, initial_state=initial_state, dtype=tf.float32)
+			rnn_cell = tf.contrib.rnn.MultiRNNCell(
+				[tf.contrib.rnn.LSTMCell(self._lstmParams.lstmSize()),
+				 tf.contrib.rnn.LSTMCell(self._lstmParams.lstmSize()),
+				 tf.contrib.rnn.LSTMCell(self._lstmParams.lstmSize())])
+			outputs, states = tf.nn.static_rnn(rnn_cell, dataset, initial_state=initial_state, dtype=tf.float32)
 
 			out_output = np.empty([data.shape[0], 0, self._lstmParams.fftFreqBins()])
 			weights = self._weight_variable([self._lstmParams.lstmSize(), self._lstmParams.fftFreqBins()])
@@ -62,9 +82,36 @@ class SimpleLSTMArchitecture(Architecture):
 
 			for output in outputs:
 				mat_muled = tf.matmul(output, weights) + biases
-				output = tf.reshape(mat_muled, [-1, 1, self._lstmParams.fftFreqBins()])
+				output = tf.expand_dims(mat_muled, axis=1)
 				out_output = tf.concat([out_output, output], axis=1)
-			return out_output
+			return out_output, states
+
+	def _network(self, data, reuse=False):
+		with tf.variable_scope("Network", reuse=reuse):
+			# initialize LSTM states with data
+			forward_lstmed, forward_states = self._lstmNetwork(data, None, reuse, 'forward_lstm')
+			output_audio = forward_lstmed[:, -4:, :]
+
+			for i in range(int(self._lstmParams.outputWindowCount())+3):
+				next_frame, forward_states = self._lstmNetwork(output_audio[:, -1:, :], forward_states, True,
+															   'forward_lstm')
+				output_audio = tf.concat([output_audio, next_frame], axis=1)
+
+			predictedFrames = self._predictNetwork(output_audio, reuse)
+			return predictedFrames
+
+	def _predictNetwork(self, mixed_gaps, reuse):
+		with tf.variable_scope("predict", reuse=reuse):
+			mixing_variables = self._weight_variable(
+				[self._lstmParams.fftFreqBins() * 7, self._lstmParams.fftFreqBins()])
+			output = tf.zeros([self._lstmParams.batchSize(), 0, self._lstmParams.fftFreqBins()])
+			for i in range(3, self._lstmParams.outputWindowCount()+3):
+				intermediate_output = tf.reshape(mixed_gaps[:, i-3:i+4], (self._lstmParams.batchSize(),
+																		  self._lstmParams.fftFreqBins() * 7))
+				intermediate_output = tf.matmul(intermediate_output, mixing_variables)
+				intermediate_output = tf.expand_dims(intermediate_output, axis=1)
+				output = tf.concat([output, intermediate_output], axis=1)
+			return output
 
 	def _weight_variable(self, shape):
 		return tf.get_variable('W', shape, initializer=tf.contrib.layers.xavier_initializer())

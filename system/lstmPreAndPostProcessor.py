@@ -7,9 +7,10 @@ class LSTMPreAndPostProcessor(object):
 
 	def inputAndTarget(self, signal):
 		realAndImagStft = self._realAndImagStft(signal)
+		shape = realAndImagStft.shape
 
-		netInput = realAndImagStft[:, :-1, :]
-		target = realAndImagStft[:, 1:, :]
+		netInput = realAndImagStft[:, :-self._lstmParameters.outputWindowCount(), :]
+		target = realAndImagStft[:, -self._lstmParameters.outputWindowCount():, :]
 
 		return netInput, target
 
@@ -17,7 +18,6 @@ class LSTMPreAndPostProcessor(object):
 		stft = tf.contrib.signal.stft(signals=signal,
 									  frame_length=self._lstmParameters.fftWindowLength(),
 									  frame_step=self._lstmParameters.fftHopSize())
-		return tf.abs(stft)
-		# real_part = tf.real(stft)
-		# imag_part = tf.imag(stft)
-		# return tf.stack([real_part, imag_part], axis=-1, name='divideComplexIntoRealAndImag')
+		real_part = tf.real(stft)
+		imag_part = tf.imag(stft)
+		return tf.stack([real_part, imag_part], axis=-1, name='divideComplexIntoRealAndImag')
