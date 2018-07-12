@@ -20,4 +20,4 @@ aPreProcessor = LSTMPreAndPostProcessor(params)
 
 aContextEncoderSystem = LSTMSystem(aContextEncoderArchitecture, batch_size, aPreProcessor, params, sessionsName)
 
-aContextEncoderSystem.train("utils/chopin_w16384_g8192_h1024.tfrecords", "utils/chopin_w16384_g8192_h1024.tfrecords", 1e-3)
+aContextEncoderSystem.train("chopin_w16384_g8192_h1024.tfrecords", "chopin_w16384_g8192_h1024.tfrecords", 1e-3)
