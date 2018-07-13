@@ -15,7 +15,7 @@ params = LstmParameters(lstmSize=512, batchSize=batch_size, signalLength=16384, 
 
 aContextEncoderArchitecture = SimpleLSTMArchitecture(inputShape=(params.batchSize(),
 																 params.fftFrames()-outputWindowCount,
-																 params.fftFreqBins(), 2), lstmParams=params)
+																 params.fftFreqBins()), lstmParams=params)
 
 aPreProcessor = LSTMPreAndPostProcessor(params)
 
