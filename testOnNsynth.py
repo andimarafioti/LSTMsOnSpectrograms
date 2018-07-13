@@ -9,12 +9,13 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 sessionsName = "nsynth_"
 
 batch_size = 64
+outputWindowCount = 100
 params = LstmParameters(lstmSize=512, batchSize=batch_size, signalLength=16384, fftWindowLength=256, fftHopSize=64,
-						outputWindowCount=40)
+						outputWindowCount=outputWindowCount)
 
 aContextEncoderArchitecture = SimpleLSTMArchitecture(inputShape=(params.batchSize(),
-																 params.fftFrames()-1,
-																 params.fftFreqBins()), lstmParams=params)
+																 params.fftFrames()-outputWindowCount,
+																 params.fftFreqBins(), 2), lstmParams=params)
 
 aPreProcessor = LSTMPreAndPostProcessor(params)
 
