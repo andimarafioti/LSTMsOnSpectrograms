@@ -103,11 +103,12 @@ class SimpleLSTMArchitecture(Architecture):
 
 	def _predictNetwork(self, mixed_gaps, reuse):
 		with tf.variable_scope("predict", reuse=reuse):
+			batch_size = mixed_gaps.shape.as_list()[0]
 			mixing_variables = self._weight_variable(
 				[self._lstmParams.fftFreqBins() * 7, self._lstmParams.fftFreqBins()])
-			output = tf.zeros([self._lstmParams.batchSize(), 0, self._lstmParams.fftFreqBins()])
+			output = tf.zeros([batch_size, 0, self._lstmParams.fftFreqBins()])
 			for i in range(3, self._lstmParams.outputWindowCount()+3):
-				intermediate_output = tf.reshape(mixed_gaps[:, i-3:i+4], (self._lstmParams.batchSize(),
+				intermediate_output = tf.reshape(mixed_gaps[:, i-3:i+4], (batch_size,
 																		  self._lstmParams.fftFreqBins() * 7))
 				intermediate_output = tf.matmul(intermediate_output, mixing_variables)
 				intermediate_output = tf.expand_dims(intermediate_output, axis=1)
