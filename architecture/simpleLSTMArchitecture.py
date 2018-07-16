@@ -17,7 +17,7 @@ class SimpleLSTMArchitecture(Architecture):
 			self._state = None
 
 			intermediateOutput = self._network(seedInput[:, int(-self._lstmParams.fftFrames()):, :], reuse=True)
-			seedInput = tf.concat([seedInput, intermediateOutput[:, -1:, :]], axis=1)
+			seedInput = tf.concat([seedInput, intermediateOutput], axis=1)
 			print(seedInput.shape.as_list()[1])
 
 			for i in range(seedInput.shape.as_list()[1], length):
