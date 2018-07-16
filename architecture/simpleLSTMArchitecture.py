@@ -18,8 +18,9 @@ class SimpleLSTMArchitecture(Architecture):
 
 			intermediateOutput = self._network(seedInput[:, int(-self._lstmParams.fftFrames()):, :], reuse=True)
 			seedInput = tf.concat([seedInput, intermediateOutput[:, -1:, :]], axis=1)
+			print(seedInput.shape.as_list()[1])
 
-			for i in range(1, length):
+			for i in range(seedInput.shape.as_list()[1], length):
 				intermediateOutput = self._network(seedInput[:, -1:, :], initial_state=self._state, reuse=True)
 				seedInput = tf.concat([seedInput, intermediateOutput[:, -1:, :]], axis=1)
 
@@ -86,14 +87,14 @@ class SimpleLSTMArchitecture(Architecture):
 				out_output = tf.concat([out_output, output], axis=1)
 			return out_output, states
 
-	def _network(self, data, reuse=False):
+	def _network(self, data, reuse=False, initial_state=None):
 		with tf.variable_scope("Network", reuse=reuse):
 			# initialize LSTM states with data
-			forward_lstmed, forward_states = self._lstmNetwork(data, None, reuse, 'forward_lstm')
+			forward_lstmed, self._state = self._lstmNetwork(data, initial_state, reuse, 'forward_lstm')
 			output_audio = forward_lstmed[:, -4:, :]
 
 			for i in range(int(self._lstmParams.outputWindowCount())+3):
-				next_frame, forward_states = self._lstmNetwork(output_audio[:, -1:, :], forward_states, True,
+				next_frame, forward_states = self._lstmNetwork(output_audio[:, -1:, :], self._state, True,
 															   'forward_lstm')
 				output_audio = tf.concat([output_audio, next_frame], axis=1)
 
